@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical SEO Audit Dashboard - Irish Pub Properties | EcomLuxx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0a2a4a 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(64, 224, 208, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(32, 192, 176, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(64, 224, 208, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Navigation Sidebar - Always visible on desktop */
+        .nav-sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(64, 224, 208, 0.3);
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-sidebar.mobile-hidden {
+            transform: translateX(-100%);
+        }
+
+        .nav-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(64, 224, 208, 0.2);
+            text-align: center;
+        }
+
+        .nav-logo {
+            max-width: 200px;
+            height: auto;
+            filter: drop-shadow(0 4px 12px rgba(64, 224, 208, 0.3));
+            margin-bottom: 15px;
+        }
+
+        .nav-subtitle {
+            color: #b0c4de;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 15px 25px;
+            color: #b0c4de;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: #40e0d0;
+            background: rgba(64, 224, 208, 0.1);
+            border-left-color: #40e0d0;
+        }
+
+        .nav-item .icon {
+            display: inline-block;
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            transition: margin-left 0.2s ease;
+            min-height: 100vh;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 0;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(64, 224, 208, 0.3);
+            padding: 20px 30px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-toggle {
+            background: none;
+            border: none;
+            color: #40e0d0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: none;
+        }
+
+        .nav-toggle:hover {
+            background: rgba(64, 224, 208, 0.1);
+        }
+
+        .progress-bar {
+            flex: 1;
+            margin: 0 30px;
+            height: 6px;
+            background: rgba(64, 224, 208, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #40e0d0, #20c0b0);
+            border-radius: 3px;
+            width: 0%;
+            animation: progressFill 2s ease-out forwards;
+        }
+
+        @keyframes progressFill {
+            to { width: 75%; }
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #b0c4de;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Page Sections */
+        .page-section {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideInUp 0.6s ease-out forwards;
+            margin-bottom: 40px;
+        }
+
+        .page-section:nth-child(1) { animation-delay: 0.1s; }
+        .page-section:nth-child(2) { animation-delay: 0.2s; }
+        .page-section:nth-child(3) { animation-delay: 0.3s; }
+        .page-section:nth-child(4) { animation-delay: 0.4s; }
+        .page-section:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            padding: 60px 40px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 24px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(64, 224, 208, 0.3);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 60px rgba(64, 224, 208, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(64, 224, 208, 0.1), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .header h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #40e0d0, #20c0b0, #60f0e0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px rgba(64, 224, 208, 0.3);
+            letter-spacing: -0.02em;
+        }
+
+        .header .subtitle {
+            font-size: 1.3rem;
+            color: #b0c4de;
+            font-weight: 400;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .branding {
+            background: linear-gradient(135deg, rgba(64, 224, 208, 0.15), rgba(32, 192, 176, 0.1));
+            border: 1px solid rgba(64, 224, 208, 0.4);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .branding::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(64, 224, 208, 0.6), transparent);
+        }
+
+        .logo-container {
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            max-width: 300px;
+            height: auto;
+            filter: drop-shadow(0 4px 12px rgba(64, 224, 208, 0.3));
+            transition: filter 0.3s ease;
+        }
+
+        .logo:hover {
+            filter: drop-shadow(0 8px 20px rgba(64, 224, 208, 0.5));
+        }
+
+        .branding .prepared-by {
+            font-size: 1.2rem;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .branding .contact-info {
+            font-size: 1rem;
+            color: #a0c0c0;
+            font-weight: 400;
+        }
+
+        .audit-date {
+            background: linear-gradient(135deg, rgba(64, 224, 208, 0.2), rgba(32, 192, 176, 0.1));
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 40px;
+            border: 1px solid rgba(64, 224, 208, 0.4);
+            backdrop-filter: blur(10px);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .section {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(64, 224, 208, 0.2);
+            backdrop-filter: blur(15px);
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(64, 224, 208, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border-color: rgba(64, 224, 208, 0.4);
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(64, 224, 208, 0.3), transparent);
+        }
+
+        .section h2 {
+            color: #40e0d0;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .section h3 {
+            color: #60f0e0;
+            font-size: 1.6rem;
+            margin: 35px 0 20px 0;
+            border-bottom: 2px solid rgba(64, 224, 208, 0.3);
+            padding-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #40e0d0, #20c0b0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 15px rgba(64, 224, 208, 0.3);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, rgba(64, 224, 208, 0.15), rgba(32, 192, 176, 0.1));
+            padding: 35px;
+            border-radius: 20px;
+            border: 1px solid rgba(64, 224, 208, 0.4);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(64, 224, 208, 0.2);
+            border-color: rgba(64, 224, 208, 0.6);
+        }
+
+        .summary-card h4 {
+            color: #40e0d0;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .summary-card .number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(64, 224, 208, 0.3);
+        }
+
+        .summary-card .label {
+            color: #b0c4de;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .data-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .data-type {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(64, 224, 208, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .data-type h4 {
+            color: #40e0d0;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(64, 224, 208, 0.2);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #b0c4de;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-pass {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+
+        .status-fail {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .status-good {
+            background: rgba(64, 224, 208, 0.2);
+            color: #40e0d0;
+            border: 1px solid rgba(64, 224, 208, 0.4);
+        }
+
+        .critical-issues {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1));
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .critical-issues h3 {
+            color: #ef4444;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .issue-list {
+            list-style: none;
+        }
+
+        .issue-list li {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 1.05rem;
+        }
+
+        .issue-list li:last-child {
+            border-bottom: none;
+        }
+
+        .issue-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(64, 224, 208, 0.2), rgba(32, 192, 176, 0.15));
+            border: 1px solid rgba(64, 224, 208, 0.5);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .highlight-box h4 {
+            color: #40e0d0;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .highlight-box p {
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #40e0d0, #20c0b0);
+            color: #000;
+            padding: 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .data-table td {
+            padding: 15px 18px;
+            border-bottom: 1px solid rgba(64, 224, 208, 0.2);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .data-table tr:hover {
+            background: rgba(64, 224, 208, 0.1);
+        }
+
+        .broken-link {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            color: #ff6b6b;
+            word-break: break-all;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 50px 0;
+            color: #b0c4de;
+            border-top: 1px solid rgba(64, 224, 208, 0.3);
+            margin-top: 50px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer .company {
+            color: #40e0d0;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .nav-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .nav-sidebar.mobile-visible {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .nav-toggle {
+                display: block;
+            }
+
+            .top-bar {
+                padding: 15px 20px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 40px 20px;
+            }
+
+            .section {
+                padding: 25px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Sidebar -->
+    <nav class="nav-sidebar" id="navSidebar">
+        <div class="nav-header">
+            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ECOM_LUXX_LOGO_1080_x_300px_2_400x-c0juSwFaIyhnNWXSc9gGGnNCfcMFOd.avif" alt="EcomLuxx Logo" class="nav-logo">
+            <div class="nav-subtitle">SEO Audit Dashboard</div>
+        </div>
+        <div class="nav-menu">
+            <a href="#overview" class="nav-item active">
+                <span class="icon">📋</span>Overview
+            </a>
+            <a href="#meta-analysis" class="nav-item">
+                <span class="icon">📝</span>Meta Analysis
+            </a>
+            <a href="#heading-structure" class="nav-item">
+                <span class="icon">🏗️</span>Heading Structure
+            </a>
+            <a href="#broken-links" class="nav-item">
+                <span class="icon">🔗</span>Broken Links
+            </a>
+            <a href="#structured-data" class="nav-item">
+                <span class="icon">🏷️</span>Structured Data
+            </a>
+            <a href="#core-vitals" class="nav-item">
+                <span class="icon">⚡</span>Core Web Vitals
+            </a>
+            <a href="#timeline" class="nav-item">
+                <span class="icon">📅</span>Implementation
+            </a>
+            <a href="#results" class="nav-item">
+                <span class="icon">📈</span>Expected Results
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="nav-toggle" id="navToggle">☰</button>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Analysis Complete</span>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Header -->
+            <div class="page-section header">
+                <h1>🔍 Technical SEO Audit Dashboard</h1>
+                <div class="subtitle">Comprehensive Analysis & Strategic Recommendations</div>
+            </div>
+
+            <!-- Branding -->
+            <div class="page-section branding">
+                <div class="logo-container">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ECOM_LUXX_LOGO_1080_x_300px_2_400x-c0juSwFaIyhnNWXSc9gGGnNCfcMFOd.avif" alt="EcomLuxx Logo" class="logo">
+                </div>
+                <div class="prepared-by">Prepared by: <strong>Patrick Dhital</strong></div>
+                <div class="contact-info">Senior SEO Strategist | EcomLuxx Digital Marketing</div>
+            </div>
+
+            <!-- Audit Date -->
+            <div class="page-section audit-date">
+                <strong>📅 Analysis Date:</strong> June 17, 2025 | <strong>📊 Pages Analyzed:</strong> 60+ | <strong>🔗 Links Checked:</strong> 451
+            </div>
+
+            <!-- Executive Summary -->
+            <div class="page-section section" id="overview">
+                <h2><span class="icon">📋</span>Executive Summary</h2>
+                
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h4>Kierans.com</h4>
+                        <div class="number">C+</div>
+                        <div class="label">75% pages need meta optimization</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>The Local Minneapolis</h4>
+                        <div class="number">B-</div>
+                        <div class="label">Good foundation, minor issues</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>The Local West End</h4>
+                        <div class="number">B</div>
+                        <div class="label">Best overall performance</div>
+                    </div>
+                </div>
+
+                <div class="critical-issues">
+                    <h3>🚨 Priority Issues Requiring Attention</h3>
+                    <ul class="issue-list">
+                        <li><span class="issue-icon">!</span>ALL homepages have 7 H1 tags (should be 1) - Major SEO violation</li>
+                        <li><span class="issue-icon">!</span>Kierans menu page missing H1 tag completely</li>
+                        <li><span class="issue-icon">!</span>75% of Kierans pages have meta title/description issues</li>
+                        <li><span class="issue-icon">!</span>47 broken links found across all properties</li>
+                        <li><span class="issue-icon">!</span>Social sharing completely broken (AddToAny failures)</li>
+                        <li><span class="issue-icon">!</span>NO structured data/schema markup implemented anywhere</li>
+                        <li><span class="issue-icon">!</span>Real-world Core Web Vitals performance gaps</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Meta Tags Analysis -->
+            <div class="page-section section" id="meta-analysis">
+                <h2><span class="icon">📝</span>Meta Tags & Page Optimization Analysis</h2>
+                
+                <h3>🎯 Kierans.com - Critical Meta Tag Issues</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Page</th>
+                            <th>Title Issue</th>
+                            <th>Description Issue</th>
+                            <th>Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Homepage</td>
+                            <td>68 chars (TOO LONG)</td>
+                            <td>469 chars (WAY TOO LONG)</td>
+                            <td><span class="metric-value status-fail">CRITICAL</span></td>
+                        </tr>
+                        <tr>
+                            <td>Menu Page</td>
+                            <td>24 chars (TOO SHORT)</td>
+                            <td>24 chars (TOO SHORT)</td>
+                            <td><span class="metric-value status-fail">CRITICAL</span></td>
+                        </tr>
+                        <tr>
+                            <td>Events Page</td>
+                            <td>88 chars (TOO LONG)</td>
+                            <td>379 chars (TOO LONG)</td>
+                            <td><span class="metric-value status-warning">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td>Locations Page</td>
+                            <td>78 chars (TOO LONG)</td>
+                            <td>230 chars (TOO LONG)</td>
+                            <td><span class="metric-value status-warning">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td>Private Rooms</td>
+                            <td>87 chars (TOO LONG)</td>
+                            <td>348 chars (TOO LONG)</td>
+                            <td><span class="metric-value status-warning">MEDIUM</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight-box">
+                    <h4>📊 Meta Tags Summary</h4>
+                    <p><strong>Kierans.com:</strong> 15/20 pages have title issues, 18/20 pages have description issues</p>
+                    <p><strong>The Local Minneapolis:</strong> 8/20 pages need optimization</p>
+                    <p><strong>The Local West End:</strong> 6/20 pages need optimization</p>
+                    <p><strong>Common Issue:</strong> ALL pages missing meta keywords (not critical but recommended)</p>
+                </div>
+
+                <h3>✅ Recommended Meta Tag Fixes</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Page</th>
+                            <th>Current Title</th>
+                            <th>Recommended Title</th>
+                            <th>Character Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Kierans Homepage</td>
+                            <td>Kieran's Irish Pub I Food, Drinks, and Events I Downtown Minneapolis</td>
+                            <td>Kieran's Irish Pub | Downtown Minneapolis | Food & Drinks</td>
+                            <td>58 chars ✓</td>
+                        </tr>
+                        <tr>
+                            <td>Kierans Menu</td>
+                            <td>Menu | Kierans Irish Pub</td>
+                            <td>Irish Pub Menu | Traditional Food & Drinks | Kieran's Minneapolis</td>
+                            <td>59 chars ✓</td>
+                        </tr>
+                        <tr>
+                            <td>Kierans Events</td>
+                            <td>Pub Events I Live Music, Sports, and the Best Pre-Game and Post-Game Fun in Minneapolis!</td>
+                            <td>Live Music & Sports Events | Kieran's Irish Pub Minneapolis</td>
+                            <td>58 chars ✓</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Heading Structure Analysis -->
+            <div class="page-section section" id="heading-structure">
+                <h2><span class="icon">🏗️</span>Heading Structure Analysis</h2>
+                
+                <h3>❌ Critical H1 Tag Violations</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Website</th>
+                            <th>Page</th>
+                            <th>H1 Count</th>
+                            <th>Issue</th>
+                            <th>SEO Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Kierans.com</td>
+                            <td>Homepage</td>
+                            <td>7 H1 tags</td>
+                            <td>Multiple H1s</td>
+                            <td><span class="metric-value status-fail">CRITICAL</span></td>
+                        </tr>
+                        <tr>
+                            <td>Kierans.com</td>
+                            <td>Menu Page</td>
+                            <td>0 H1 tags</td>
+                            <td>Missing H1</td>
+                            <td><span class="metric-value status-fail">CRITICAL</span></td>
+                        </tr>
+                        <tr>
+                            <td>The Local Minneapolis</td>
+                            <td>Homepage</td>
+                            <td>7 H1 tags</td>
+                            <td>Multiple H1s</td>
+                            <td><span class="metric-value status-fail">CRITICAL</span></td>
+                        </tr>
+                        <tr>
+                            <td>The Local West End</td>
+                            <td>Homepage</td>
+                            <td>7 H1 tags</td>
+                            <td>Multiple H1s</td>
+                            <td><span class="metric-value status-fail">CRITICAL</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight-box">
+                    <h4>🎯 H1 Tag Best Practices Violated</h4>
+                    <p><strong>Rule:</strong> Each page should have exactly ONE H1 tag</p>
+                    <p><strong>Current Issue:</strong> Homepage templates have 7 H1 tags each</p>
+                    <p><strong>SEO Impact:</strong> Confuses search engines about page topic hierarchy</p>
+                    <p><strong>Fix Required:</strong> WordPress theme-level modification needed</p>
+                </div>
+
+                <h3>📋 Heading Hierarchy Issues</h3>
+                <p>Beyond H1 violations, several pages skip heading levels (H2 → H4) which impacts accessibility and SEO structure. The Local Minneapolis shows "Heading elements are not in a sequentially-descending order" in PageSpeed Insights accessibility audit.</p>
+            </div>
+
+            <!-- Broken Links Analysis -->
+            <div class="page-section section" id="broken-links">
+                <h2><span class="icon">🔗</span>Broken Links Analysis</h2>
+                
+                <h3>🚨 47 Broken Links Found Across All Sites</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Broken URL</th>
+                            <th>Error Code</th>
+                            <th>Issue Type</th>
+                            <th>Found On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="broken-link">https://www.addtoany.com/add_to/reddit?linkurl=https%3A%2F%2Fkierans.com%2Fpub-events%2F</span></td>
+                            <td>403 Forbidden</td>
+                            <td>Social Sharing</td>
+                            <td>Kierans.com</td>
+                        </tr>
+                        <tr>
+                            <td><span class="broken-link">https://www.facebook.com/kieransirishpub/</span></td>
+                            <td>400 Bad Request</td>
+                            <td>Social Media</td>
+                            <td>Kierans.com</td>
+                        </tr>
+                        <tr>
+                            <td><span class="broken-link">https://kierans.com/xmlrpc.php</span></td>
+                            <td>403 Forbidden</td>
+                            <td>WordPress Security</td>
+                            <td>Kierans.com</td>
+                        </tr>
+                        <tr>
+                            <td><span class="broken-link">webcal://kierans.com/?post_type=tribe_events&ical=1</span></td>
+                            <td>Connection Error</td>
+                            <td>Calendar Export</td>
+                            <td>Kierans.com</td>
+                        </tr>
+                        <tr>
+                            <td><span class="broken-link">https://fonts.gstatic.com</span></td>
+                            <td>404 Not Found</td>
+                            <td>Font Loading</td>
+                            <td>Kierans.com</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight-box">
+                    <h4>🔍 Broken Links by Category</h4>
+                    <p><strong>Social Sharing (AddToAny):</strong> 23 broken links - Plugin misconfiguration</p>
+                    <p><strong>Social Media Links:</strong> 8 broken links - Facebook/Instagram access issues</p>
+                    <p><strong>WordPress Security:</strong> 6 broken links - xmlrpc.php blocked (good security)</p>
+                    <p><strong>Font/Resource Loading:</strong> 4 broken links - CDN or path issues</p>
+                    <p><strong>Calendar/Export Features:</strong> 6 broken links - Event calendar plugin issues</p>
+                </div>
+
+                <h3>🛠️ Immediate Fixes Required</h3>
+                <ul class="issue-list">
+                    <li><span class="issue-icon">1</span>Reconfigure AddToAny social sharing plugin</li>
+                    <li><span class="issue-icon">2</span>Update Facebook page URL or fix access permissions</li>
+                    <li><span class="issue-icon">3</span>Fix calendar export functionality</li>
+                    <li><span class="issue-icon">4</span>Resolve font loading issues</li>
+                </ul>
+            </div>
+
+            <!-- Structured Data Analysis -->
+            <div class="page-section section" id="structured-data">
+                <h2><span class="icon">🏷️</span>Structured Data & Schema Markup</h2>
+                
+                <div class="critical-issues">
+                    <h3>❌ Complete Absence of Structured Data</h3>
+                    <ul class="issue-list">
+                        <li><span class="issue-icon">!</span>NO LocalBusiness schema markup on any site</li>
+                        <li><span class="issue-icon">!</span>NO Restaurant schema for menu/food information</li>
+                        <li><span class="issue-icon">!</span>NO Event schema for pub events and live music</li>
+                        <li><span class="issue-icon">!</span>NO Organization schema for business information</li>
+                        <li><span class="issue-icon">!</span>NO Review/Rating schema for customer testimonials</li>
+                    </ul>
+                </div>
+
+                <h3>🎯 Required Schema Implementation</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Schema Type</th>
+                            <th>Implementation Priority</th>
+                            <th>Expected Benefit</th>
+                            <th>Pages to Apply</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>LocalBusiness</td>
+                            <td><span class="metric-value status-fail">CRITICAL</span></td>
+                            <td>Local search visibility</td>
+                            <td>All homepages</td>
+                        </tr>
+                        <tr>
+                            <td>Restaurant</td>
+                            <td><span class="metric-value status-fail">CRITICAL</span></td>
+                            <td>Menu rich snippets</td>
+                            <td>Menu pages</td>
+                        </tr>
+                        <tr>
+                            <td>Event</td>
+                            <td><span class="metric-value status-warning">HIGH</span></td>
+                            <td>Event rich snippets</td>
+                            <td>Events pages</td>
+                        </tr>
+                        <tr>
+                            <td>Organization</td>
+                            <td><span class="metric-value status-warning">HIGH</span></td>
+                            <td>Brand knowledge panel</td>
+                            <td>About pages</td>
+                        </tr>
+                        <tr>
+                            <td>Review</td>
+                            <td><span class="metric-value status-good">MEDIUM</span></td>
+                            <td>Star ratings in search</td>
+                            <td>All pages</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight-box">
+                    <h4>💡 Schema Implementation Strategy</h4>
+                    <p><strong>Tool:</strong> Use Rank Math SEO plugin (already installed) schema builder</p>
+                    <p><strong>Priority 1:</strong> LocalBusiness schema with NAP (Name, Address, Phone)</p>
+                    <p><strong>Priority 2:</strong> Restaurant schema with menu, cuisine type, price range</p>
+                    <p><strong>Priority 3:</strong> Event schema for live music and sports events</p>
+                    <p><strong>Testing:</strong> Use Google Rich Results Test to validate implementation</p>
+                </div>
+            </div>
+
+            <!-- Core Web Vitals Analysis -->
+            <div class="page-section section" id="core-vitals">
+                <h2><span class="icon">⚡</span>Core Web Vitals: Lab vs Field Data Analysis</h2>
+                
+                <div class="highlight-box">
+                    <h4>🎯 Understanding the Data Difference</h4>
+                    <p><strong>Lab Data:</strong> Simulated testing environment - shows potential performance under ideal conditions</p>
+                    <p><strong>Field Data:</strong> Real user experience over 28 days - shows actual performance in the wild</p>
+                    <p><strong>Why Both Matter:</strong> Lab data guides optimization, Field data shows real business impact</p>
+                </div>
+
+                <h3>📊 All Three Websites - Complete Data Comparison</h3>
+                
+                <h4>Kierans.com</h4>
+                <div class="data-comparison">
+                    <div class="data-type">
+                        <h4>🧪 Lab Data (Lighthouse)</h4>
+                        <div class="metric-row">
+                            <span class="metric-label">Desktop CLS</span>
+                            <span class="metric-value status-pass">0.1 ⚠️ BORDERLINE</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Mobile CLS</span>
+                            <span class="metric-value status-pass">0.0 ✓ EXCELLENT</span>
+                        </div>
+                    </div>
+                    <div class="data-type">
+                        <h4>🌍 Field Data (Real Users)</h4>
+                        <div class="metric-row">
+                            <span class="metric-label">Desktop CLS</span>
+                            <span class="metric-value status-pass">PASSED ✓</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Mobile CLS</span>
+                            <span class="metric-value status-pass">PASSED ✓</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>The Local Minneapolis</h4>
+                <div class="data-comparison">
+                    <div class="data-type">
+                        <h4>🧪 Lab Data (Lighthouse)</h4>
+                        <div class="metric-row">
+                            <span class="metric-label">Desktop CLS</span>
+                            <span class="metric-value status-pass">0.041 ✓ GOOD</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Mobile CLS</span>
+                            <span class="metric-value status-pass">0.0 ✓ EXCELLENT</span>
+                        </div>
+                    </div>
+                    <div class="data-type">
+                        <h4>🌍 Field Data (Real Users)</h4>
+                        <div class="metric-row">
+                            <span class="metric-label">Desktop CLS</span>
+                            <span class="metric-value status-fail">0.13 ❌ NEEDS WORK</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Mobile CLS</span>
+                            <span class="metric-value status-pass">0.01 ✓ GOOD</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>The Local West End</h4>
+                <div class="data-comparison">
+                    <div class="data-type">
+                        <h4>🧪 Lab Data (Lighthouse)</h4>
+                        <div class="metric-row">
+                            <span class="metric-label">Desktop CLS</span>
+                            <span class="metric-value status-pass">Similar to Minneapolis</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Mobile CLS</span>
+                            <span class="metric-value status-pass">0.0 ✓ EXCELLENT</span>
+                        </div>
+                    </div>
+                    <div class="data-type">
+                        <h4>🌍 Field Data (Real Users)</h4>
+                        <div class="metric-row">
+                            <span class="metric-label">Desktop CLS</span>
+                            <span class="metric-value status-pass">PASSED ✓</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Mobile CLS</span>
+                            <span class="metric-value status-pass">PASSED ✓</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>📈 Key Insights</h4>
+                    <p><strong>The Gap:</strong> Only The Local Minneapolis shows real-world desktop performance issues</p>
+                    <p><strong>Root Cause:</strong> Real users experience layout shifts due to varying connection speeds, browser extensions</p>
+                    <p><strong>Business Impact:</strong> Google uses Field Data for rankings - the 0.13 CLS affects SEO</p>
+                    <p><strong>Good News:</strong> Kierans.com and The Local West End pass both Lab and Field tests</p>
+                </div>
+            </div>
+
+            <!-- Implementation Timeline -->
+            <div class="page-section section" id="timeline">
+                <h2><span class="icon">📅</span>4-Week Implementation Timeline</h2>
+                
+                <h3>Week 1: Critical Technical Fixes</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Impact</th>
+                            <th>Effort</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Fix H1 tag violations (theme level)</td>
+                            <td>High</td>
+                            <td>Medium</td>
+                            <td>Developer</td>
+                        </tr>
+                        <tr>
+                            <td>Add missing H1 to Kierans menu page</td>
+                            <td>High</td>
+                            <td>Low</td>
+                            <td>Content Team</td>
+                        </tr>
+                        <tr>
+                            <td>Fix broken social sharing (AddToAny)</td>
+                            <td>Medium</td>
+                            <td>Low</td>
+                            <td>Developer</td>
+                        </tr>
+                        <tr>
+                            <td>Optimize Kierans homepage meta tags</td>
+                            <td>High</td>
+                            <td>Low</td>
+                            <td>SEO Team</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Week 2: Meta Tags & Content Optimization</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Pages Affected</th>
+                            <th>Priority</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Optimize all Kierans meta titles</td>
+                            <td>15 pages</td>
+                            <td>Critical</td>
+                            <td>SEO Team</td>
+                        </tr>
+                        <tr>
+                            <td>Optimize all Kierans meta descriptions</td>
+                            <td>18 pages</td>
+                            <td>Critical</td>
+                            <td>SEO Team</td>
+                        </tr>
+                        <tr>
+                            <td>Fix The Local Minneapolis meta issues</td>
+                            <td>8 pages</td>
+                            <td>High</td>
+                            <td>SEO Team</td>
+                        </tr>
+                        <tr>
+                            <td>Fix The Local West End meta issues</td>
+                            <td>6 pages</td>
+                            <td>High</td>
+                            <td>SEO Team</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Week 3: Structured Data Implementation</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Schema Type</th>
+                            <th>Implementation</th>
+                            <th>Testing Required</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>LocalBusiness Schema</td>
+                            <td>All 3 homepages</td>
+                            <td>Rich Results Test</td>
+                            <td>SEO Team</td>
+                        </tr>
+                        <tr>
+                            <td>Restaurant Schema</td>
+                            <td>All menu pages</td>
+                            <td>Rich Results Test</td>
+                            <td>SEO Team</td>
+                        </tr>
+                        <tr>
+                            <td>Event Schema</td>
+                            <td>Events pages</td>
+                            <td>Rich Results Test</td>
+                            <td>SEO Team</td>
+                        </tr>
+                        <tr>
+                            <td>Organization Schema</td>
+                            <td>About pages</td>
+                            <td>Rich Results Test</td>
+                            <td>SEO Team</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Week 4: Performance & Monitoring</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Focus Area</th>
+                            <th>Success Metric</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Optimize The Local Minneapolis CLS</td>
+                            <td>Desktop performance</td>
+                            <td>CLS < 0.1</td>
+                            <td>Developer</td>
+                        </tr>
+                        <tr>
+                            <td>Fix remaining broken links</td>
+                            <td>User experience</td>
+                            <td>0 broken links</td>
+                            <td>Developer</td>
+                        </tr>
+                        <tr>
+                            <td>Set up monitoring</td>
+                            <td>Ongoing tracking</td>
+                            <td>Weekly reports</td>
+                            <td>SEO Team</td>
+                        </tr>
+                        <tr>
+                            <td>Performance validation</td>
+                            <td>All improvements</td>
+                            <td>Grade improvement</td>
+                            <td>All Teams</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Expected Results -->
+            <div class="page-section section" id="results">
+                <h2><span class="icon">📈</span>Expected Results & ROI</h2>
+                
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h4>Technical SEO Score</h4>
+                        <div class="number">A-</div>
+                        <div class="label">Target grade after fixes</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Organic Traffic Increase</h4>
+                        <div class="number">25-40%</div>
+                        <div class="label">Within 3-6 months</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Local Search Visibility</h4>
+                        <div class="number">+50%</div>
+                        <div class="label">Map pack appearances</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Page Load Performance</h4>
+                        <div class="number">90+</div>
+                        <div class="label">PageSpeed score target</div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>🎯 Success Metrics to Track</h4>
+                    <p><strong>Technical:</strong> H1 compliance, meta tag optimization, schema markup validation</p>
+                    <p><strong>Performance:</strong> Core Web Vitals compliance, broken link elimination</p>
+                    <p><strong>Visibility:</strong> Local search rankings, rich snippet appearances</p>
+                    <p><strong>Business:</strong> Organic traffic growth, conversion rate improvements</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="page-section footer">
+                <div class="company">EcomLuxx</div>
+                <p><strong>Prepared by Patrick Dhital</strong> | Senior SEO Strategist</p>
+                <p>This comprehensive audit identifies 47 broken links, meta tag issues on 75% of Kierans pages, critical H1 violations, and missing structured data across all properties.</p>
+                <p style="margin-top: 15px; color: #40e0d0;">📧 Contact: patrick@ecomluxx.com | 🌐 www.ecomluxx.com</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        const navToggle = document.getElementById('navToggle');
+        const navSidebar = document.getElementById('navSidebar');
+        const mainContent = document.getElementById('mainContent');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        navToggle.addEventListener('click', () => {
+            navSidebar.classList.toggle('mobile-visible');
+        });
+
+        // Smooth scrolling for navigation
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = item.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+
+                // Update active nav item
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+
+                // Close nav on mobile
+                if (window.innerWidth <= 768) {
+                    navSidebar.classList.remove('mobile-visible');
+                }
+            });
+        });
+
+        // Intersection Observer for section highlighting
+        const sections = document.querySelectorAll('.section[id]');
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: '-100px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    navItems.forEach(nav => {
+                        nav.classList.remove('active');
+                        if (nav.getAttribute('href') === `#${id}`) {
+                            nav.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && 
+                !navSidebar.contains(e.target) && 
+                !navToggle.contains(e.target)) {
+                navSidebar.classList.remove('mobile-visible');
+            }
+        });
+
+        // Progress bar based on scroll position
+        function updateProgressBar() {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            
+            const progressFill = document.querySelector('.progress-fill');
+            progressFill.style.width = Math.min(scrollPercent, 100) + '%';
+        }
+
+        // Update progress on scroll
+        window.addEventListener('scroll', updateProgressBar);
+        window.addEventListener('load', updateProgressBar);
+
+        // Initialize progress bar
+        updateProgressBar();
+    </script>
+</body>
+</html>
